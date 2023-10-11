@@ -17,6 +17,7 @@ class Election(object):
     self.total_votes = len(vote_list)
     self.round = 1  # keeping track of number of voting rounds performed
     self.print_intro()
+    self.isTie = False
     self.winner = None
 
   def get_number_of_candidates(self):
@@ -55,8 +56,9 @@ class Election(object):
       if winner:
         self.declare_winner(winner)
       else:
-        self.declare_winner(candidate_list[0])
-        #self.declare_tie()
+        self.isTie = True
+        #self.declare_winner(candidate_list[0])
+        self.declare_tie()
     else:
       winner = self.candidate_with_50_plus_percent()
       if winner:
@@ -74,9 +76,11 @@ class Election(object):
     #print "candidate 1: %s" % candidate_1
     candidate_2 = self.results_dict[candidate_list[1]]
     #print "candidate 2: %s" % candidate_2
-    #if candidate_1 == candidate_2:
+    if candidate_1 == candidate_2:
+      self.isTie = True
+      winner = False
       #print("We have a tie!")
-    if candidate_1 > candidate_2:
+    elif candidate_1 > candidate_2:
       #print("The election has a winner!")
       #print("Winner: %s, Votes: %s" % (candidate_list[0], candidate_1))
       winner = candidate_list[0]
@@ -113,7 +117,8 @@ class Election(object):
     #print("Tally of votes in final round:")
     #for candidate,votes in sorted(self.results_dict.items()):
       #print("Candidate: %s, Votes: %s" % (candidate, votes))
-    return
+    self.winner = False
+    return False
  
   def tally_votes(self):
     '''tally_votes'''
@@ -170,7 +175,8 @@ class Election(object):
     votes_list = list(self.results_dict.values())
     minimum = min(votes_list) # determine the smallest number of votes allocated to a candidate 
     loser_count = votes_list.count(minimum)  # number of candidates with smallest number of votes e.g. a tie
-    if loser_count > 1: # there is a tie for last place with 2+ candidates 
+    if loser_count > 1: # there is a tie for last place with 2+ candidates
+      self.isTie = True 
       #print("There is a tie between candidates to be eliminated.")
       #print("An election official must determine which candidate will be removed")
       candidates_in_last = self.get_minimum_votes_candidates(minimum)

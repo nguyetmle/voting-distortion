@@ -11,7 +11,11 @@ def main():
                 allPairs.append(pair)
     ##print(allPairs)
 
-    for i in range(10):
+    for i in range(10000):
+        ball = ["E","A","B","C","D"]
+        random.shuffle(ball)
+        ballots.append(ball)
+    for i in range(10000):
         newBallot = ["A","B","C","D","E"]
         random.shuffle(newBallot)
         ballots.append(newBallot)

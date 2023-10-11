@@ -1,8 +1,28 @@
-import numpy
 from numpy import random
 import math
 from vote import Vote
 from election import Election
+import time
+from googleapiclient.discovery import build
+from google.oauth2 import service_account
+
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+SERVICE_ACCOUNT_FILE = 'summer-research-2023-bf67a99398ee.json'
+
+creds = None
+creds = service_account.Credentials.from_service_account_file(
+        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+# If modifying these scopes, delete the file token.json.
+
+
+# The ID and range of a sample spreadsheet.
+SAMPLE_SPREADSHEET_ID = '1M5cjRWLJ0Ef4CHCmB46yDDnxNB8-9zT5oipe4TT_W8s'
+
+service = build('sheets', 'v4', credentials=creds)
+
+# Call the Sheets API
+sheet = service.spreadsheets()
 
 class SVoter:
     def __init__(self, x, y, num):
@@ -112,38 +132,34 @@ def rMajorityCheck(voters,candidates,ballots):
     for can in candidates:
         if canDict[can] >= benchmark:
             return can
-    return "There is no ranked majority winner"
+    #return "There is no ranked majority winner"
 
 def rCondorcetCheck(candidates,ballots):
-    pairs = []
+    allPairs = []
     for can in candidates:
-        for can2 in candidates:
-            if can != can2:
-                pair = (can,can2)
-                pairs.append(pair)
-    pairDict = {pair:0 for pair in pairs}
+        for secondCan in candidates:
+            if can != secondCan:
+                pair = (can,secondCan)
+                allPairs.append(pair)
+    pairDict = {pair: 0 for pair in allPairs}
     for ballot in ballots:
-        for i in range(len(ballot)):
-            j = len(ballot)-i - 1
-            k = 1
-            while j>0:
-                pairing = (ballot[i],ballot[i+k])
-                pairDict[pairing] += 1
-                j -= 1
-                k += 1
-                
-    canDict = {can: True for can in candidates}
+        for indx in range(0,len(ballot)-1):
+            for i in range(indx+1,len(ballot)):
+                pair = (ballot[indx],ballot[i])
+                pairDict[pair] += 1
+    finalDict = {can: True for can in candidates}
     for can in candidates:
-        for can2 in candidates:
-            if can != can2:
-                wins = pairDict[(can,can2)]
-                losses = pairDict[(can,can2)]
-                if losses >= wins:
-                    canDict[can] = False
+        for secondCan in candidates:
+            if can != secondCan:
+                if pairDict[(can,secondCan)] < pairDict[(secondCan,can)]:
+                    finalDict[can] = False
+    winnerExists = False
     for can in candidates:
-        if canDict[can]==True:
-            return can                
-    return "There is no ranked condorcet winner"
+        if finalDict[can] == True:
+            winnerExists = True
+            return can
+    if winnerExists == False:
+       return False
 
 def rankedWinners(voters, candidates):
     ballots = getBallots(voters, candidates)
@@ -209,7 +225,7 @@ def runoff(voters,can1,can2):
         elif score2 > score1:
             can2tot += 1
     if can1tot == can2tot:
-        return "It is a tie"
+        return False
     elif can1tot > can2tot:
         return can1
     else:
@@ -234,48 +250,44 @@ def sMajorityCheck(voters,candidates):
     for can in candidates:
         if canDict[can] >= benchmark:
             return can
-    return "No outright scored majority winner"
+    #return "No outright scored majority winner"
 
 def sCondorcetCheck(voters,candidates):
-##    canDict = {can: 1 for can in candidates}
-##    for voter in voters:
-##        score = voter.scores
-##        for can in candidates:
-##            for can2 in candidates:
-##                if can != can2:
-##                    if score[can] < score[can2]:
-##                        canDict[can] = 0
-##    for can in candidates:
-##        if canDict[can] == 1:
-##            return can
-    pairs = []
+    allPairs = []
     for can in candidates:
-        for can2 in candidates:
-            if can != can2:
-                pair = (can,can2)
-                pairs.append(pair)
-    pairDict = {pair:0 for pair in pairs}
+        for secondCan in candidates:
+            if can != secondCan:
+                pair = (can, secondCan)
+                allPairs.append(pair)
+    pairDict = {pair: 0 for pair in allPairs}
     for voter in voters:
-        score = voter.scores
-        for pair in pairs:
-            if score[pair[0]] > score[pair[1]]:
-                pairDict[pair] += 1
-    canDict = {can: True for can in candidates}
+        ballot = voter.scores
+        for can in candidates:
+            for secondCan in candidates:
+                if can != secondCan:
+                    if ballot[can] > ballot[secondCan]:
+                        pair = (can,secondCan)
+                        pairDict[pair] += 1
+    finalDict = {can: True for can in candidates}
     for can in candidates:
-        for can2 in candidates:
-            if can != can2:
-                wins = pairDict[(can,can2)]
-                losses = pairDict[(can,can2)]
-                if losses >= wins:
-                    canDict[can] = False
+        for secondCan in candidates:
+            if can != secondCan:
+                if pairDict[(can,secondCan)] < pairDict[(secondCan,can)]:
+                    finalDict[can] = False
+    winnerExists = False
     for can in candidates:
-        if canDict[can]==True:
-            return can                
-    return "There is no STAR condorcet winner"
-                        
+        if finalDict[can] == True:
+            winnerExists = True
+            return can
+    if not winnerExists:
+        return False
+                      
+""" def writeOut(voters,candidates,winners):
+    inputfile = open("allTests.txt","r")
+     """
 def main():
-    n = 1000
-    m = 5
+    n = 10000
+    m = 100
     voters = []
     candidates = []
     for i in range(n):
@@ -302,37 +314,99 @@ def main():
             OPTcandidate = candidate
 
     pWinner,bWinner,cWinner,stvWinner,rMaj,rCon = rankedWinners(voters, candidates)
+    """ winList = rankedWinners(voters, candidates) """
     starWinner = STAR(voters,candidates)
+    
+    winners = [pWinner,bWinner,cWinner,stvWinner,starWinner]
     print("**** The optimal candidate was: ****")
-    print(OPTcandidate)
+    print(OPTcandidate.id)
     print("The election winners by mechanism are:")
     print("Plurality: ",end="")
-    print(pWinner)
+    print(pWinner.id)
     print("Borda: ",end="")
-    print(bWinner)
+    print(bWinner.id)
     print("Copeland: ",end="")
-    print(cWinner)
+    print(cWinner.id)
     print("STV: ",end="")
-    print(stvWinner)
+    print(stvWinner.id)
     print("STAR: ",end="")
-    print(starWinner)
-    
+    #print(starWinner.id)
+    starResult = None
+    if starWinner:
+        starResult = starWinner.id
+    else:
+        starResult = False
+        
     sMajWinner = sMajorityCheck(voters,candidates)
+    sMajResult = None
     print("**** The candidate who had the outright scoring majority is: ****")
-    print(sMajWinner)
+    #print(sMajWinner)
+    if sMajWinner:
+        sMajResult = sMajWinner.id
+    else:
+        sMajResult = False
+        
     sConWinner = sCondorcetCheck(voters,candidates)
+    sConResult = None
     print("**** The candidate who beat every other candidate in a scored head to head is: ****")
-    print(sConWinner)
+    #print(sConWinner)
+    if sConWinner:
+        sConResult = sConWinner.id
+    else: 
+        sConResult = False
+    print(sConResult)
+
+    rMajResult = None
     print("**** The candidate who had the outright ranked majority is: ****")
-    print(rMaj)
+    #print(rMaj)
+    if rMaj:
+        rMajResult = rMaj.id
+    else: 
+        rMajResult = False
+
+    rConResult = None
     print("**** The candidate who beat every other candidate in a ranked head to head is: ****")
-    print(rCon)    
+    print(rCon) 
+    if rCon:
+        rConResult = rCon.id
+    else:
+        rConResult = False
+
+
+    insert_data_option = 'INSERT_ROWS' 
+
+    
+    test = [[OPTcandidate.id, pWinner.id, bWinner.id, cWinner.id, stvWinner.id, starResult, sMajResult, sConResult, rMajResult, rConResult, n, m]]
+
+    print(test)
+
+
+
+
+    request = sheet.values().append(spreadsheetId=SAMPLE_SPREADSHEET_ID, 
+                                range="m=100!A2", valueInputOption="USER_ENTERED", insertDataOption=insert_data_option, body={"values":test}).execute() 
+    
+      
+
+    """ winnerMixUp = False
+    for win in winners:
+        if OPTcandidate != win:
+            winnerMixUp = True
+    if winnerMixUp:
+        vCoords = []
+        for voter in voters:
+             """
 
     
     
 if __name__ == "__main__":
-    for i in range(30):
-        print("Test #"+str(i+1))
-        main()
-        print()
-        print("===============================")
+    for i in range(100):
+        if i%50 == 0:
+            time.sleep(30)
+        else:
+
+            print("Test #"+str(i+1))
+            main()
+            print()
+            print("===============================")
+            print()

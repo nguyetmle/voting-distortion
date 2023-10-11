@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "summer-research-2023",
+  "private_key_id": "bf67a99398eeb241b629924c099d6a5c738ac65a",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCrZmN8uv6WthEn\ntrJnU4bGoBjDfruXk8no/KV0Vo823vGO9w8X68rewi/5B6fDGM+84yDXxtfZP8ml\nf3FxZ54toeduZzw6nZ8FPDVAWozeF82fkuQ9AnnIG1RysenYtqB7p+3WY4D+hGtp\n1geJD0GK5nLuKQLkf1K02t1g73Y6YFpJZSHw8NlswelIiXztFGO464c3jQ0hO8N3\nuYvg5+oXihUoQTON0VJV8GNGg52BXIrWPymExKJetrol1+8JsGsu/zO3fALobeOk\nAuphZ9E65qCW62jIUWM6mK0xlC4Cp/hGhf5nAHV5jVXtUsynfXN3VyHLTdCO202L\nG06pz3qNAgMBAAECggEAG3zU5S6/ABAMUcRmuZPnaCjKN+X180HoDmWgKjdsidX4\nwt8DzGgL9awKUgOEh9ENlcMOJBS3TpfAgLpeyNtffn151laXjeXz1/zXJG4xK7gB\nCb+eu1sPiUQ6x5cZQ+BL/fDJP4nfKNI3QLaqqDQqZHp/QYsRs+/oZWk5Oh/FI+jH\nEsnZ1OGekZ9GQXPNUuNOM++ch2Mm9Gofo2F4GYqjXY02vPHxt8AqgetTEX1banZp\nm6B4/4B3ykg6wBZ84TZqdQmGdew6hCTAXD9yTIVxm/sscbprCDjCu5XDZyB9xJEm\nZO7GZZ8ul0/69S6bd2WHxqrwyrw8e6o9zAAr7irg4QKBgQDgGjl/JO2ztKdlfDpg\ntHydPM23K/G8RhFTFLUxu2KqGJh6v9NX3GFWr+h6W2gYEkfr5DIRe0X91ihsatRU\nzmBw6UUwZZq9aHtjC3C+WaChMej+uAVsq6CCYezdm1Zk/ji7/3AUy1WBjJcfc0kt\npUSgiFVBbyVxhrfs1FaHD1RdoQKBgQDDy86ktZrZ466wR+uXnz/G2CRza86ajZ9v\n+ovk6kvcU+luK+KLGLiEuomi7r0Q/7MJyYyeclppDy1wwScBpCs/u+0jg+SPqhdB\n2IgTJnsAVVsUltv615OPOSAqWCngNDT/lvqmGT1BTvq5dzRYmRvRArs6uhcoVYWF\nFeJbaax9bQKBgGJXP7nqo6DDet3O+PMs4K5DW2axEwByovGZWbX8K9zGtErRWNXq\ncJCQ2uyupexCQWtjlREUzm8Ihm6lJo4cjjeeNe15+MB7VAHvqEbvn8x80WjNqhu4\n6NOuUzogC3aAFLdy7WVCoUAbSMnVVlyAdLAZg4gWVREPdDCqMVpNQNFhAoGARHvm\nBJCM4EeWE4ykZ/1Ipnl1jnWX51FAAj/lbKVS8XbcQC/TZom4CJzihX3x3Z9CdVrs\n94LSAstPPpAg358XjYxi7rg0WtfImLxvJBuijEROvk3iFcQPldoKWSVLSGOaYgfi\nFfTgCxbf9b0vLwomw52r9Wefr/jx4dH8wbKdpaUCgYBCOBhSRd/2ZbZ1wMPnv4fT\nK4yNHgJ2ybJ61LjFZAA4ob6vsA4LHqNe1F/MIsv7Qbh+KuN3a5wfnAg+LUp+qdCD\nzo4GO421DDuXhznDfpybS1FBEFlD6i21BNqN2NpLaMkpkLs/5LMLNLTXRBh6jHQJ\nROr/qC5veHk3+t61/y0WGw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "summerresearch@summer-research-2023.iam.gserviceaccount.com",
+  "client_id": "109166180607805691442",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/summerresearch%40summer-research-2023.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

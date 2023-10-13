@@ -39,7 +39,7 @@ class VoteResult:
             if self.distribution == "normal":
                 x = round(random.normal(50, 20), 1)
             elif self.distribution == "poisson":
-                x = random.poisson(50, 1)
+                x = random.poisson(50, 1)[0]
             elif self.distribution == "uniform":
                 x = random.uniform(50, 1)
             voter = SVoter(x, i)
@@ -55,7 +55,7 @@ class VoteResult:
             if self.distribution == "normal":
                 x = round(random.normal(50, 20), 1)
             elif self.distribution == "poisson":
-                x = random.poisson(50, 1)
+                x = random.poisson(50, 1)[0]
             elif self.distribution == "uniform":
                 x = round(random.uniform(50, 1), 1)
             candidate = SCandidate(x, i)
@@ -272,7 +272,7 @@ class VoteResult:
 
 def main():
 
-    test = VoteResult(3, 10, "poisson")
+    test = VoteResult(3, 10, "uniform")
     print(test.STV())
     print(test.distortion(test.STV()))
 if __name__ == "__main__":  

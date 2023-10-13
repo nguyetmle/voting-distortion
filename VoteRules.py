@@ -30,7 +30,7 @@ class SCandidate:
 class VoteResult:
     def __init__(self, n, m):
         self.voters = []
-        selfcandidates = []
+        self.candidates = []
         for i in range(n):
             x = round(random.normal(50, 20), 1)
             voter = SVoter(x, i)
@@ -41,22 +41,22 @@ class VoteResult:
             candidate = SCandidate(x, i)
             self.candidates.append(candidate)
 
-        minDistance = float('inf')
+        self.minDistance = float('inf')
         self.OPTcandidate = self.candidates[0]
         for candidate in self.candidates:
             sumDistance = 0
             for voter in self.voters:
                 distance = abs(voter.x - candidate.x)
                 sumDistance += distance
-            if sumDistance < minDistance:
-                minDistance = sumDistance
+            if sumDistance < self.minDistance:
+                self.minDistance = sumDistance
                 self.OPTcandidate = candidate
 
         #get preference profile of each voter
         self.ballots = []
-        for voter in voters:
+        for voter in self.voters:
             distances = {}
-            for candidate in candidates:
+            for candidate in self.candidates:
                 distance = abs(voter.x - candidate.x)
                 distances[candidate] = distance         
             sorted_dict = sorted(distances, key = distances.get)
@@ -234,7 +234,22 @@ class VoteResult:
         secondCandidate = sorted_dict[1]
         winner = self.runoff(self.voters, firstCandidate, secondCandidate)
         return winner
+    
+    def distortion(candidate):
+        for voter in self.voters:
+            distance = abs(voter.x - candidate.x)
+            sumDistance += distance
+
+    
+        distortion = sumDistance / self.minDistance
+        return distortion
 
 
 
+def main():
+
+    test = VoteResult(3, 10)
+    print(test.plurality())
+if __name__ == "__main__":  
+    main()
     

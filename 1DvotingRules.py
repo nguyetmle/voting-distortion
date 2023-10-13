@@ -8,12 +8,6 @@ import time
 from googleapiclient.discovery import build
 from google.oauth2 import service_account
 
-SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'summer-research-2023-bf67a99398ee.json'
-
-creds = None
-creds = service_account.Credentials.from_service_account_file(
-        SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
 # If modifying these scopes, delete the file token.json.
 

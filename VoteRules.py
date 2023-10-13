@@ -182,13 +182,13 @@ class VoteResult:
         winner = list(points)
         return winner[0]   
 
-    def getScores(voters, candidates):
+    def getScores(self):
         totalScores = {}
-        for voter in voters:
+        for voter in self.voters:
             distances = {}
             minDis = float('inf')
             maxDis = 0
-            for candidate in candidates:
+            for candidate in self.candidates:
                 distance = abs(voter.x - candidate.x)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
@@ -210,7 +210,7 @@ class VoteResult:
             scoringMatrix.append(three)
             scoringMatrix.append(four)
             scoringMatrix.append(five)
-            for candidate in candidates:
+            for candidate in self.candidates:
                 dis = distances[candidate]
                 i = 0
                 for score in scoringMatrix:
@@ -224,10 +224,10 @@ class VoteResult:
             voter.setScores(distances)
         return totalScores
 
-    def runoff(voters,can1,can2):
+    def runoff(self, can1,can2):
         can1tot = 0
         can2tot = 0
-        for voter in voters:
+        for voter in self.voters:
             voterBallot = voter.scores
             score1 = voterBallot[can1]
             score2 = voterBallot[can2]
@@ -243,14 +243,15 @@ class VoteResult:
             return can2
 
     def STAR(self):
-        finalScores = self.getScores(self.voters, self.candidates)
+        finalScores = self.getScores()
         sorted_dict = sorted(finalScores, key = finalScores.get, reverse=True)
         firstCandidate = sorted_dict[0]
         secondCandidate = sorted_dict[1]
-        winner = self.runoff(self.voters, firstCandidate, secondCandidate)
+        winner = self.runoff(firstCandidate, secondCandidate)
         return winner
     
-    def distortion(candidate):
+    def distortion(self,candidate):
+        sumDistance = 0 
         for voter in self.voters:
             distance = abs(voter.x - candidate.x)
             sumDistance += distance
@@ -264,7 +265,8 @@ class VoteResult:
 def main():
 
     test = VoteResult(3, 10)
-    print(test.plurality())
+    print(test.STAR())
+    print(test.distortion(test.plurality()))
 if __name__ == "__main__":  
     main()
     

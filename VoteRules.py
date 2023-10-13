@@ -28,16 +28,31 @@ class SCandidate:
         return "Candidate "+str(self.id)
     
 class VoteResult:
-    def __init__(self, n, m):
+    def __init__(self, n, m, distribution="normal"):
         self.voters = []
         self.candidates = []
+        self.distribution = distribution
+
+        #generate voters for different distributions
         for i in range(n):
-            x = round(random.normal(50, 20), 1)
+            if self.distribution == "normal":
+                x = round(random.normal(50, 20), 1)
+            elif self.distribution == "poisson":
+                x = round(random.poisson(50, 20), 1)
+            elif self.distribution == "binomial":
+                x = round(random.binomial(50, 20), 1)
+
             voter = SVoter(x, i)
             self.voters.append(voter)
 
+        #generate candidates for different distributions
         for i in range(m):
-            x = round(random.normal(50, 20), 1)
+            if self.distribution == "normal":
+                x = round(random.normal(50, 20), 1)
+            elif self.distribution == "poisson":
+                x = round(random.poisson(50, 20), 1)
+            elif self.distribution == "binomial":
+                x = round(random.binomial(50, 20), 1)
             candidate = SCandidate(x, i)
             self.candidates.append(candidate)
 

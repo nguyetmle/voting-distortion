@@ -111,8 +111,8 @@ class VoteResult:
         election = Election(votes)
         election.run_election()
         winner = election.winner
-        stvTie = election.isTie
-        return winner, stvTie
+        
+        return winner
 
     def copeland(self):
         points = {}
@@ -251,6 +251,9 @@ class VoteResult:
         return winner
     
     def distortion(self,candidate):
+        if not candidate:
+            return False
+        
         sumDistance = 0 
         for voter in self.voters:
             distance = abs(voter.x - candidate.x)
@@ -259,14 +262,14 @@ class VoteResult:
     
         distortion = sumDistance / self.minDistance
         return distortion
-
+        
 
 
 def main():
 
     test = VoteResult(3, 10)
-    print(test.STAR())
-    print(test.distortion(test.plurality()))
+    print(test.STV())
+    print(test.distortion(test.STV()))
 if __name__ == "__main__":  
     main()
     

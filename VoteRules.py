@@ -34,25 +34,30 @@ class VoteResult:
         self.distribution = distribution
 
         #generate voters for different distributions
+        
         for i in range(n):
             if self.distribution == "normal":
                 x = round(random.normal(50, 20), 1)
             elif self.distribution == "poisson":
-                x = round(random.poisson(50, 20), 1)
-            elif self.distribution == "binomial":
-                x = round(random.binomial(50, 20), 1)
-
+                x = random.poisson(50, 1)
+            elif self.distribution == "uniform":
+                x = random.uniform(50, 1)
             voter = SVoter(x, i)
             self.voters.append(voter)
+
+        
+            
+
+            
 
         #generate candidates for different distributions
         for i in range(m):
             if self.distribution == "normal":
                 x = round(random.normal(50, 20), 1)
             elif self.distribution == "poisson":
-                x = round(random.poisson(50, 20), 1)
-            elif self.distribution == "binomial":
-                x = round(random.binomial(50, 20), 1)
+                x = random.poisson(50, 1)
+            elif self.distribution == "uniform":
+                x = round(random.uniform(50, 1), 1)
             candidate = SCandidate(x, i)
             self.candidates.append(candidate)
 
@@ -267,7 +272,7 @@ class VoteResult:
 
 def main():
 
-    test = VoteResult(3, 10)
+    test = VoteResult(3, 10, "poisson")
     print(test.STV())
     print(test.distortion(test.STV()))
 if __name__ == "__main__":  

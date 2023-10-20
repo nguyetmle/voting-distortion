@@ -1,4 +1,5 @@
 from numpy import random
+import numpy as np
 import math
 from vote import Vote
 from election import Election
@@ -33,32 +34,31 @@ class VoteResult:
         self.candidates = []
         self.distribution = distribution
 
-        #generate voters for different distributions
-        
-        for i in range(n):
-            if self.distribution == "normal":
-                x = round(random.normal(50, 20), 1)
-            elif self.distribution == "poisson":
-                x = random.poisson(50, 1)[0]
-            elif self.distribution == "uniform":
-                x = random.uniform(50, 1)
-            voter = SVoter(x, i)
+        #generate random coordinates of voters and candidates for different distributions
+        if self.distribution == "normal":
+            voters = random.normal(50, 18,n)
+            candidates = random.normal(50, 18, m)
+        elif self.distribution == "poisson":
+            voters = random.poisson(30, n)
+            candidates = random.poisson(30, m)
+        elif self.distribution == "uniform":
+            voters = random.uniform(0, 100, n)
+            candidates = random.uniform(0, 100, m)
+        elif self.distribution == "bimodal":
+            voters1 = random.normal(30, 10, n//2)
+            voters2 = random.normal(70, 10, n-n//2)
+            voters = np.concatenate((voters1, voters2), axis=None)
+            candidates1 = random.normal(30, 10, m//2)
+            candidates2 = random.normal(70, 10, m-m//2)
+            candidates = np.concatenate((candidates1, candidates2), axis = None)
+        #generate voters and candidates based on the coordinates
+        for i in range(len(voters)):
+            voter = SVoter(voters[i], i)
             self.voters.append(voter)
 
+        for i in range(len(candidates)):
         
-            
-
-            
-
-        #generate candidates for different distributions
-        for i in range(m):
-            if self.distribution == "normal":
-                x = round(random.normal(50, 20), 1)
-            elif self.distribution == "poisson":
-                x = random.poisson(50, 1)[0]
-            elif self.distribution == "uniform":
-                x = round(random.uniform(50, 1), 1)
-            candidate = SCandidate(x, i)
+            candidate = SCandidate(candidates[i], i)
             self.candidates.append(candidate)
 
         self.minDistance = float('inf')

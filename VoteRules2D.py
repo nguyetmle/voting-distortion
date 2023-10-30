@@ -1,14 +1,16 @@
 from numpy import random
 import numpy as np
+import scipy as sp
 import math
 from vote import Vote
 from election import Election
-""" import matplotlib.pyplot as plt """
+import matplotlib.pyplot as plt 
 
 
-class SVoter:
-    def __init__(self, x, num):
+class SVoter2D:
+    def __init__(self, x, y, num):
         self.x = x
+        self.y = y
         self.id = num
         self.scores = {}
 
@@ -18,53 +20,65 @@ class SVoter:
     def __str__(self):
         return "Voter "+str(self.id)
 
-class SCandidate:
-    def __init__(self, x, num):
+class SCandidate2D:
+    def __init__(self, x, y, num):
         self.x = x
+        self.y = y
         self.id = num
 
     def __str__(self):
         return "Candidate "+str(self.id)
     
-class VoteResult:
+class VoteResult2D:
     def __init__(self, n, m, distribution="normal"):
-        self.voters = []
-        self.candidates = []
+        self.voters = []      #size of voters is n
+        self.candidates = []  #size of candidates is m
         self.distribution = distribution
+
 
         #generate random coordinates of voters and candidates for different distributions
         if self.distribution == "normal":
-            voters = random.normal(50, 18,n)
-            candidates = random.normal(50, 18, m)
+            x_voters = random.normal(50, 18,n)
+            y_voters = random.normal(50, 18,n)
+            x_candidates = random.normal(50, 18, m)
+            y_candidates = random.normal(50, 18, m)
+            
         elif self.distribution == "poisson":
-            voters = random.poisson(30, n)
-            candidates = random.poisson(30, m)
+            x_voters = random.poisson(30, n)
+            y_voters = random.poisson(30, n)
+            x_candidates = random.poisson(30, m)
+            y_candidates = random.poisson(30, m)
+
         elif self.distribution == "uniform":
-            voters = random.uniform(0, 100, n)
-            candidates = random.uniform(0, 100, m)
-        elif self.distribution == "bimodal":
-            voters1 = random.normal(30, 10, n//2)
-            voters2 = random.normal(70, 10, n-n//2)
-            voters = np.concatenate((voters1, voters2), axis=None)
-            candidates1 = random.normal(30, 10, m//2)
-            candidates2 = random.normal(70, 10, m-m//2)
-            candidates = np.concatenate((candidates1, candidates2), axis = None)
+            x_voters = random.uniform(0, 100, n)
+            y_voters = random.uniform(0, 100, n)
+            x_candidates = random.uniform(0, 100, m)
+            y_candidates = random.uniform(0, 100, m)
+
+        # elif self.distribution == "bimodal":
+        #     voters1 = random.normal(30, 10, n//2)
+        #     voters2 = random.normal(70, 10, n-n//2)
+        #     voters = np.concatenate((voters1, voters2), axis=None)
+        #     candidates1 = random.normal(30, 10, m//2)
+        #     candidates2 = random.normal(70, 10, m-m//2)
+        #     candidates = np.concatenate((candidates1, candidates2), axis = None)
+        
         #generate voters and candidates based on the coordinates
-        for i in range(len(voters)):
-            voter = SVoter(voters[i], i)
+        for i in range(n):
+            voter = SVoter2D(x_voters[i], y_voters[i], i)
             self.voters.append(voter)
 
-        for i in range(len(candidates)):
-        
-            candidate = SCandidate(candidates[i], i)
+        for i in range(m):
+            candidate = SCandidate2D(x_candidates[i], y_candidates[i], i)
             self.candidates.append(candidate)
+
 
         self.minDistance = float('inf')
         self.OPTcandidate = self.candidates[0]
         for candidate in self.candidates:
             sumDistance = 0
             for voter in self.voters:
-                distance = abs(voter.x - candidate.x)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
                 sumDistance += distance
             if sumDistance < self.minDistance:
                 self.minDistance = sumDistance
@@ -75,7 +89,7 @@ class VoteResult:
         for voter in self.voters:
             distances = {}
             for candidate in self.candidates:
-                distance = abs(voter.x - candidate.x)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
                 distances[candidate] = distance         
             sorted_dict = sorted(distances, key = distances.get)
             self.ballots.append(sorted_dict)
@@ -192,7 +206,7 @@ class VoteResult:
             minDis = float('inf')
             maxDis = 0
             for candidate in self.candidates:
-                distance = abs(voter.x - candidate.x)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
                     maxDis = int(distance)
@@ -259,20 +273,21 @@ class VoteResult:
         
         sumDistance = 0 
         for voter in self.voters:
-            distance = abs(voter.x - candidate.x)
+            distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
             sumDistance += distance
 
     
         distortion = sumDistance / self.minDistance
         return distortion
-        
+    
+
 
 
 def main():
-
-    test = VoteResult(3, 10, "uniform")
+    test = VoteResult2D(3, 100, "normal")
     print(test.STV())
     print(test.distortion(test.STV()))
+    
 if __name__ == "__main__":  
     main()
     

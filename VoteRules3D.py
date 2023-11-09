@@ -7,10 +7,11 @@ from election import Election
 import matplotlib.pyplot as plt 
 
 
-class SVoter2D:
-    def __init__(self, x, y, num):
+class SVoter3D:
+    def __init__(self, num, x, y=0, z=0):
         self.x = x
         self.y = y
+        self.z = z
         self.id = num
         self.scores = {}
 
@@ -20,56 +21,91 @@ class SVoter2D:
     def __str__(self):
         return "Voter "+str(self.id)
 
-class SCandidate2D:
-    def __init__(self, x, y, num):
+class SCandidate3D:
+    def __init__(self, num, x, y=0, z=0):
         self.x = x
         self.y = y
+        self.z = z
         self.id = num
 
     def __str__(self):
         return "Candidate "+str(self.id)
     
-class VoteResult2D:
-    def __init__(self, n, m, distribution="normal"):
+class VoteResult3D:
+    def __init__(self, n, m, dimension = "1D", distribution="normal"):
         self.voters = []      #size of voters is n
         self.candidates = []  #size of candidates is m
         self.distribution = distribution
-
+        self.dimension = dimension
 
         #generate random coordinates of voters and candidates for different distributions
         if self.distribution == "normal":
             x_voters = random.normal(50, 18,n)
-            y_voters = random.normal(50, 18,n)
             x_candidates = random.normal(50, 18, m)
+            y_voters = random.normal(50, 18,n)
             y_candidates = random.normal(50, 18, m)
+            z_voters = random.normal(50, 18,n)
+            z_candidates = random.normal(50, 18, m)
+            
             
         elif self.distribution == "poisson":
             x_voters = random.poisson(30, n)
-            y_voters = random.poisson(30, n)
             x_candidates = random.poisson(30, m)
+            y_voters = random.poisson(30, n)
             y_candidates = random.poisson(30, m)
+            z_voters = random.poisson(30, n)
+            z_candidates = random.poisson(30, m)
 
         elif self.distribution == "uniform":
             x_voters = random.uniform(0, 100, n)
-            y_voters = random.uniform(0, 100, n)
             x_candidates = random.uniform(0, 100, m)
+            y_voters = random.uniform(0, 100, n)
             y_candidates = random.uniform(0, 100, m)
+            z_voters = random.uniform(0, 100, n)
+            z_candidates = random.uniform(0, 100, m)
 
-        # elif self.distribution == "bimodal":
-        #     voters1 = random.normal(30, 10, n//2)
-        #     voters2 = random.normal(70, 10, n-n//2)
-        #     voters = np.concatenate((voters1, voters2), axis=None)
-        #     candidates1 = random.normal(30, 10, m//2)
-        #     candidates2 = random.normal(70, 10, m-m//2)
-        #     candidates = np.concatenate((candidates1, candidates2), axis = None)
-        
+        elif self.distribution == "bimodal":
+            x_voters1 = random.normal(30, 10, n//2)
+            x_voters2 = random.normal(70, 10, n-n//2)
+            y_voters1 = random.normal(30,10,n//2)
+            y_voters2 = random.normal(70, 10, n-n//2)
+            z_voters1 = random.normal(30,10,n//2)
+            z_voters2 = random.normal(70, 10, n-n//2)
+
+            x_candidates1 = random.normal(30, 10, m//2)   
+            x_candidates2 = random.normal(70, 10, m-m//2)
+            y_candidates1 = random.normal(30, 10, m//2)
+            y_candidates2 = random.normal(70, 10, m-m//2)
+            z_candidates1 = random.normal(30, 10, m//2)
+            z_candidates2 = random.normal(70, 10, m-m//2)
+
+            x_voters = np.concatenate((x_voters1, x_voters2), axis=None)
+            y_voters = np.concatenate((y_voters1, y_voters2), axis=None)
+            z_voters = np.concatenate((z_voters1, z_voters2), axis=None)
+
+            x_candidates = np.concatenate((x_candidates1, x_candidates2), axis = None)
+            y_candidates = np.concatenate((y_candidates1, y_candidates2), axis = None)
+            z_candidates = np.concatenate((z_candidates1, z_candidates2), axis = None)
+
         #generate voters and candidates based on the coordinates
         for i in range(n):
-            voter = SVoter2D(x_voters[i], y_voters[i], i)
+            voter = None
+            if self.dimension == "1D":
+                voter = SVoter3D(i, x_voters[i])
+            elif self.dimension == "2D":
+                voter = SVoter3D(i, x_voters[i], y_voters[i])
+            elif self.dimension == "3D":
+                voter = SVoter3D(i, x_voters[i], y_voters[i], z_voters[i])
             self.voters.append(voter)
 
         for i in range(m):
-            candidate = SCandidate2D(x_candidates[i], y_candidates[i], i)
+            candidate = None
+            if self.dimension == "1D":
+                candidate = SCandidate3D(i, x_candidates[i])
+            elif self.dimension == "2D":
+                candidate = SCandidate3D(i, x_candidates[i], y_candidates[i])
+            elif self.dimension == "3D":
+                candidate = SCandidate3D(i, x_candidates[i], y_candidates[i], z_candidates[i])
             self.candidates.append(candidate)
 
 
@@ -78,7 +114,7 @@ class VoteResult2D:
         for candidate in self.candidates:
             sumDistance = 0
             for voter in self.voters:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
                 sumDistance += distance
             if sumDistance < self.minDistance:
                 self.minDistance = sumDistance
@@ -89,7 +125,7 @@ class VoteResult2D:
         for voter in self.voters:
             distances = {}
             for candidate in self.candidates:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
                 distances[candidate] = distance         
             sorted_dict = sorted(distances, key = distances.get)
             self.ballots.append(sorted_dict)
@@ -166,38 +202,36 @@ class VoteResult2D:
 
 
     def pluralityVeto(self):
+        # plurality stage - each candidate is given score equals the number of times they are first-choice
         points = {}
         for ballot in self.ballots:
             if ballot[0] in points:
                 points[ballot[0]] += 1
             else:
                 points[ballot[0]] = 1
-        k = -1
+        
+        # veto stage 
         numToRemove = len(points) - 1
         while numToRemove>0:
             for ballot in self.ballots:
-                if ballot[k] in points:
-                    if points[ballot[k]] == 1:
-                        del points[ballot[k]]
-                        numToRemove -= 1
-                        if numToRemove == 0:
-                            break
-                    else:
-                        points[ballot[k]] -= 1
-                else:
-                    j = k
-                    while not ballot[j] in points:
-                        j -= 1
-                    if points[ballot[j]] == 1:
-                        del points[ballot[j]]
-                        numToRemove -= 1
-                        if numToRemove == 0:
-                            break
-                    else:
-                        points[ballot[j]] -= 1
-            k -= 1
-        winner = list(points)
-        return winner[0]   
+                # find the bottom-choice candidate among the the standing one
+                k = -1
+                while not ballot[k] in points:
+                    k -= 1
+
+                # decrement score 
+                points[ballot[k]] -= 1
+
+                # eleminate the candidate when score reaches 0
+                if points[ballot[k]] == 0:
+                    points.pop(ballot[k]) 
+                    numToRemove -= 1
+                    if numToRemove == 0:
+                        break
+        
+        # the last standing candidate is the winner
+        winner = list(points)[0]
+        return winner
 
     def getScores(self):
         totalScores = {}
@@ -284,9 +318,8 @@ class VoteResult2D:
 
 
 def main():
-    test = VoteResult2D(3, 100, "normal")
-    print(test.STV())
-    print(test.distortion(test.STV()))
+    test = VoteResult3D(5, 15, "1D", "normal")
+    print(test.pluralityVeto())
     
 if __name__ == "__main__":  
     main()

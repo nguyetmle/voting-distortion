@@ -139,8 +139,8 @@ class VoteResult3D:
                 votes[ballot[0]] += 1
             else:
                 votes[ballot[0]] = 1
-        sorted_dict = sorted(votes.items(), key = lambda kv: kv[1], reverse = True)      
-        return sorted_dict[0][0]
+        self.sorted_dict = sorted(votes.items(), key = lambda kv: kv[1], reverse = True)      
+        return self.sorted_dict[0][0]
 
     def borda(self):
         points = {}
@@ -239,8 +239,10 @@ class VoteResult3D:
             distances = {}
             minDis = float('inf')
             maxDis = 0
+
+
             for candidate in self.candidates:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z)**2)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
                     maxDis = int(distance)
@@ -314,15 +316,19 @@ class VoteResult3D:
         distortion = sumDistance / self.minDistance
         return distortion
     
+    def majorityCheck(self, candidate):
+        if self.sorted_dict[0][1] > len(self.voters)/2:
+            if candidate != self.sorted_dict[0][0]:
+                return False
+            else:
+                return True
+        return None
 
 
 
 def main():
-    test = VoteResult3D(3, 10, "3D", "normal")
-    print(test.OPTcandidate)
-    print(test.plurality())
-
-    print(test.distortion(test.plurality()))
+    test = VoteResult3D(5, 15, "1D", "normal")
+    print(test.pluralityVeto())
     
 if __name__ == "__main__":  
     main()

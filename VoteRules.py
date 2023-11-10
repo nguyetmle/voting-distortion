@@ -89,8 +89,8 @@ class VoteResult:
                 votes[ballot[0]] += 1
             else:
                 votes[ballot[0]] = 1
-        sorted_dict = sorted(votes.items(), key = lambda kv: kv[1], reverse = True)      
-        return sorted_dict[0][0]
+        self.sorted_dict = sorted(votes.items(), key = lambda kv: kv[1], reverse = True)      
+        return self.sorted_dict[0][0]
 
     def borda(self):
         points = {}
@@ -267,7 +267,7 @@ class VoteResult:
         return distortion
         
 
-
+    
 def main():
 
     test = VoteResult(3, 10, "uniform")

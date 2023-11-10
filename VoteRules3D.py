@@ -240,7 +240,7 @@ class VoteResult3D:
             minDis = float('inf')
             maxDis = 0
             for candidate in self.candidates:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z)**2)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
                     maxDis = int(distance)
@@ -307,7 +307,7 @@ class VoteResult3D:
         
         sumDistance = 0 
         for voter in self.voters:
-            distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
+            distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z)**2)
             sumDistance += distance
 
     
@@ -318,8 +318,11 @@ class VoteResult3D:
 
 
 def main():
-    test = VoteResult3D(5, 15, "1D", "normal")
-    print(test.pluralityVeto())
+    test = VoteResult3D(3, 10, "3D", "normal")
+    print(test.OPTcandidate)
+    print(test.plurality())
+
+    print(test.distortion(test.plurality()))
     
 if __name__ == "__main__":  
     main()

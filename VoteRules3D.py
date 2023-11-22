@@ -166,8 +166,8 @@ class VoteResult3D:
         winner = election.winner
         
         return winner
-
-    def copeland(self):
+    
+    def head_to_head(self):
         points = {}
         score1 = 0
         score2 = 0
@@ -197,6 +197,16 @@ class VoteResult3D:
                 score1 = 0
                 score2 = 0
         sorted_dict = sorted(points.items(), key = lambda kv: kv[1], reverse = True)
+        
+        #check if a Condorcet Winner exists
+        self.hasCondorcetWinner = False
+        if sorted_dict[0][1] == len(self.candidates) - 1:
+            self.hasCondorcetWinner = True
+            self.condorcetWinner = sorted_dict[0][0]
+        return sorted_dict
+        
+    def copeland(self):
+        sorted_dict = self.head_to_head()
         return sorted_dict[0][0]
 
 
@@ -324,11 +334,18 @@ class VoteResult3D:
                 return True
         return None
 
-
+    def condorcetCheck(self, candidate):
+        self.head_to_head()
+        if self.hasCondorcetWinner:
+            return candidate == self.condorcetWinner
+        else:
+            return None
 
 def main():
-    test = VoteResult3D(5, 15, "1D", "normal")
+    test = VoteResult3D(200, 15, "1D", "normal")
     print(test.pluralityVeto())
+    print(test.condorcetCheck(test.plurality()))
+    print(test.condorcetCheck(test.copeland()))
     
 if __name__ == "__main__":  
     main()

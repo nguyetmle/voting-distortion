@@ -12,7 +12,6 @@ class SVoter3D:
         self.x = x
         self.y = y
         self.z = z
-        
         self.id = num
         self.scores = {}
 
@@ -56,7 +55,6 @@ class VoteResult3D:
             y_candidates = random.poisson(30, m)
             z_voters = random.poisson(30, n)
             z_candidates = random.poisson(30, m)
-           
 
         elif self.distribution == "uniform":
             x_voters = random.uniform(0, 100, n)
@@ -65,7 +63,6 @@ class VoteResult3D:
             y_candidates = random.uniform(0, 100, m)
             z_voters = random.uniform(0, 100, n)
             z_candidates = random.uniform(0, 100, m)
-            
 
         elif self.distribution == "bimodal":
             x_voters1 = random.normal(30, 10, n//2)
@@ -99,7 +96,6 @@ class VoteResult3D:
                 voter = SVoter3D(i, x_voters[i], y_voters[i])
             elif self.dimension == "3D":
                 voter = SVoter3D(i, x_voters[i], y_voters[i], z_voters[i])
-            
             self.voters.append(voter)
 
         for i in range(m):
@@ -110,35 +106,27 @@ class VoteResult3D:
                 candidate = SCandidate3D(i, x_candidates[i], y_candidates[i])
             elif self.dimension == "3D":
                 candidate = SCandidate3D(i, x_candidates[i], y_candidates[i], z_candidates[i])
-            
             self.candidates.append(candidate)
 
 
-        self.minDistance = float('inf')
-        self.OPTcandidate = self.candidates[0]
-        for candidate in self.candidates:
-            sumDistance = 0
-            for voter in self.voters:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
-                sumDistance += distance
-            if sumDistance < self.minDistance:
-                self.minDistance = sumDistance
-                self.OPTcandidate = candidate
-       
+    
+    def getBallot(self, candidates):
         #get preference profile of each voter given a set of candidates
-        self.ballots = []
+        ballots = []
         for voter in self.voters:
             distances = {}
-            for candidate in self.candidates:
+            for candidate in candidates:
                 distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
                 distances[candidate] = distance         
             sorted_dict = sorted(distances, key = distances.get)
-            self.ballots.append(sorted_dict)
+            ballots.append(sorted_dict)
         
+        return ballots
 
-    def plurality(self):
+    def plurality(self, candidates):
+        ballots = self.getBallot(candidates)
         votes = {}
-        for ballot in self.ballots:
+        for ballot in ballots:
             if ballot[0] in votes:
                 votes[ballot[0]] += 1
             else:
@@ -146,9 +134,10 @@ class VoteResult3D:
         self.sorted_dict = sorted(votes.items(), key = lambda kv: kv[1], reverse = True)      
         return self.sorted_dict[0][0]
 
-    def borda(self):
+    def borda(self, candidates):
+        ballots = self.getBallot(candidates)
         points = {}
-        for ballot in self.ballots:
+        for ballot in ballots:
             n = len(ballot)
             i = 1
             for candidate in ballot:
@@ -160,9 +149,10 @@ class VoteResult3D:
         sorted_dict = sorted(points.items(), key = lambda kv: kv[1], reverse = True)     
         return sorted_dict[0][0]
 
-    def STV(self):
+    def STV(self, candidates):
+        ballots = self.getBallot(candidates)
         votes = []
-        for ballot in self.ballots:
+        for ballot in ballots:
             vote = Vote(ballot)
             votes.append(vote)
         election = Election(votes)
@@ -171,54 +161,57 @@ class VoteResult3D:
         
         return winner
     
-    def head_to_head(self):
+    def head_to_head(self,candidates):
+        ballots = self.getBallot(candidates)
         points = {}
         score1 = 0
         score2 = 0
-        for i in range(len(self.candidates)):
-            for j in range(i + 1, len(self.candidates)):
-                for ballot in self.ballots:
+        for i in range(len(candidates)):
+            for j in range(i + 1, len(candidates)):
+                for ballot in ballots:
                     found = False
                     k = 0
                     while not found:
-                        if ballot[k] == self.candidates[i]:
+                        if ballot[k] == candidates[i]:
                             score1 += 1
                             found = True
-                        elif ballot[k] == self.candidates[j]:
+                        elif ballot[k] == candidates[j]:
                             score2 += 1
                             found = True
                         k += 1             
                 if score1 >= score2:
-                    if self.candidates[i] in points:
-                        points[self.candidates[i]] += 1
+                    if candidates[i] in points:
+                        points[candidates[i]] += 1
                     else:
-                        points[self.candidates[i]] = 1
+                        points[candidates[i]] = 1
                 else:
-                    if self.candidates[j] in points:
-                        points[self.candidates[j]] += 1
+                    if candidates[j] in points:
+                        points[candidates[j]] += 1
                     else:
-                        points[self.candidates[j]] = 1
+                        points[candidates[j]] = 1
                 score1 = 0
                 score2 = 0
         sorted_dict = sorted(points.items(), key = lambda kv: kv[1], reverse = True)
         
         #check if a Condorcet Winner exists
         self.hasCondorcetWinner = False
-        if sorted_dict[0][1] == len(self.candidates) - 1:
+        if sorted_dict[0][1] == len(candidates) - 1:
             self.hasCondorcetWinner = True
             self.condorcetWinner = sorted_dict[0][0]
+
         return sorted_dict
         
-    def copeland(self):
-        sorted_dict = self.head_to_head()
+    def copeland(self, candidates):
+        sorted_dict = self.head_to_head(candidates)
         return sorted_dict[0][0]
 
 
 
-    def pluralityVeto(self):
+    def pluralityVeto(self, candidates):
+        ballots = self.getBallot(candidates)
         # plurality stage - each candidate is given score equals the number of times they are first-choice
         points = {}
-        for ballot in self.ballots:
+        for ballot in ballots:
             if ballot[0] in points:
                 points[ballot[0]] += 1
             else:
@@ -227,7 +220,7 @@ class VoteResult3D:
         # veto stage 
         numToRemove = len(points) - 1
         while numToRemove>0:
-            for ballot in self.ballots:
+            for ballot in ballots:
                 # find the bottom-choice candidate among the the standing one
                 k = -1
                 while not ballot[k] in points:
@@ -247,7 +240,7 @@ class VoteResult3D:
         winner = list(points)[0]
         return winner
 
-    def getScores(self):
+    def getScores(self, candidates):
         totalScores = {}
         for voter in self.voters:
             distances = {}
@@ -255,8 +248,8 @@ class VoteResult3D:
             maxDis = 0
 
 
-            for candidate in self.candidates:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
+            for candidate in candidates:
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z)**2)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
                     maxDis = int(distance)
@@ -277,7 +270,7 @@ class VoteResult3D:
             scoringMatrix.append(three)
             scoringMatrix.append(four)
             scoringMatrix.append(five)
-            for candidate in self.candidates:
+            for candidate in candidates:
                 dis = distances[candidate]
                 i = 0
                 for score in scoringMatrix:
@@ -309,47 +302,91 @@ class VoteResult3D:
         else:
             return can2
 
-    def STAR(self):
-        finalScores = self.getScores()
+    def STAR(self, candidates):
+        finalScores = self.getScores(candidates)
         sorted_dict = sorted(finalScores, key = finalScores.get, reverse=True)
         firstCandidate = sorted_dict[0]
         secondCandidate = sorted_dict[1]
         winner = self.runoff(firstCandidate, secondCandidate)
         return winner
     
-    def distortion(self,candidate):
-        if not candidate:
-            return False
+
+    def iiaCheck(self, method):
+        if method == "plurality":
+            #original plurality winner
+            original_winner = self.plurality(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.plurality(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
         
-        sumDistance = 0 
-        for voter in self.voters:
-            distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z)**2)
-            sumDistance += distance
+        elif method == "STV":
+            #original plurality winner
+            original_winner = self.STV(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.STV(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
 
-    
-        distortion = sumDistance / self.minDistance
-        return distortion
-    
-    def majorityCheck(self, candidate):
-        if self.sorted_dict[0][1] > len(self.voters)/2:
-            if candidate != self.sorted_dict[0][0]:
-                return False
-            else:
-                return True
-        return None
-
-    def condorcetCheck(self, candidate):
-        self.head_to_head()
-        if self.hasCondorcetWinner:
-            return candidate == self.condorcetWinner
-        else:
-            return None
+        elif method == "STAR":
+            #original plurality winner
+            original_winner = self.STAR(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.STAR(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
+        elif method == "copeland":
+            #original plurality winner
+            original_winner = self.copeland(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.copeland(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
+        elif method == "pluralityVeto":
+            #original plurality winner
+            original_winner = self.pluralityVeto(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.pluralityVeto(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
+        elif method == "borda":
+            #original plurality winner
+            original_winner = self.borda(self.candidates)
+            for i in range(len(self.candidates)):
+                if self.candidates[i] == original_winner:
+                    continue
+                removed_candidates = self.candidates[:i] + self.candidates[i+1:]
+                new_winner = self.borda(removed_candidates)
+                if new_winner != original_winner:
+                    return False
+            return True
+        
+        
+        
 
 def main():
-    test = VoteResult3D(200, 15, "1D", "normal")
-    print(test.pluralityVeto())
-    print(test.condorcetCheck(test.plurality()))
-    print(test.condorcetCheck(test.copeland()))
+    test = VoteResult3D(100, 15, "1D", "normal")
+    print(test.iiaCheck("STAR"))
     
 if __name__ == "__main__":  
     main()

@@ -12,6 +12,7 @@ class SVoter3D:
         self.x = x
         self.y = y
         self.z = z
+        
         self.id = num
         self.scores = {}
 
@@ -55,6 +56,7 @@ class VoteResult3D:
             y_candidates = random.poisson(30, m)
             z_voters = random.poisson(30, n)
             z_candidates = random.poisson(30, m)
+           
 
         elif self.distribution == "uniform":
             x_voters = random.uniform(0, 100, n)
@@ -63,6 +65,7 @@ class VoteResult3D:
             y_candidates = random.uniform(0, 100, m)
             z_voters = random.uniform(0, 100, n)
             z_candidates = random.uniform(0, 100, m)
+            
 
         elif self.distribution == "bimodal":
             x_voters1 = random.normal(30, 10, n//2)
@@ -96,6 +99,7 @@ class VoteResult3D:
                 voter = SVoter3D(i, x_voters[i], y_voters[i])
             elif self.dimension == "3D":
                 voter = SVoter3D(i, x_voters[i], y_voters[i], z_voters[i])
+            
             self.voters.append(voter)
 
         for i in range(m):
@@ -106,6 +110,7 @@ class VoteResult3D:
                 candidate = SCandidate3D(i, x_candidates[i], y_candidates[i])
             elif self.dimension == "3D":
                 candidate = SCandidate3D(i, x_candidates[i], y_candidates[i], z_candidates[i])
+            
             self.candidates.append(candidate)
 
 
@@ -242,7 +247,7 @@ class VoteResult3D:
 
 
             for candidate in self.candidates:
-                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2)
+                distance = math.sqrt((voter.x - candidate.x) ** 2 + (voter.y - candidate.y) ** 2 + (voter.z - candidate.z) ** 2)
                 distances[candidate] = int(distance)
                 if distance >= maxDis:
                     maxDis = int(distance)

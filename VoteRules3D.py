@@ -171,7 +171,7 @@ class VoteResult3D:
         
         return winner
     
-    def head_to_head(self):
+    def head_to_head(self,c_type=0.5):
         points = {}
         score1 = 0
         score2 = 0
@@ -187,8 +187,17 @@ class VoteResult3D:
                         elif ballot[k] == self.candidates[j]:
                             score2 += 1
                             found = True
-                        k += 1             
-                if score1 >= score2:
+                        k += 1            
+                if score1 == score2:
+                    if self.candidates[i] in points:
+                        points[self.candidates[i]] += c_type
+                    else:
+                        points[self.candidates[i]] = c_type
+                    if self.candidates[j] in points:
+                        points[self.candidates[j]] += c_type
+                    else:
+                        points[self.candidates[j]] = c_type
+                elif score1 > score2:
                     if self.candidates[i] in points:
                         points[self.candidates[i]] += 1
                     else:
@@ -209,8 +218,8 @@ class VoteResult3D:
             self.condorcetWinner = sorted_dict[0][0]
         return sorted_dict
         
-    def copeland(self):
-        sorted_dict = self.head_to_head()
+    def copeland(self,c_type):
+        sorted_dict = self.head_to_head(c_type)
         return sorted_dict[0][0]
 
 

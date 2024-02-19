@@ -161,7 +161,7 @@ class VoteResult3D:
         
         return winner
     
-    def head_to_head(self,candidates):
+    def head_to_head(self, candidates, c_type):
         ballots = self.getBallot(candidates)
         points = {}
         score1 = 0
@@ -178,31 +178,39 @@ class VoteResult3D:
                         elif ballot[k] == candidates[j]:
                             score2 += 1
                             found = True
-                        k += 1             
-                if score1 >= score2:
-                    if candidates[i] in points:
-                        points[candidates[i]] += 1
+                        k += 1            
+                if score1 == score2:
+                    if self.candidates[i] in points:
+                        points[self.candidates[i]] += c_type
                     else:
-                        points[candidates[i]] = 1
+                        points[self.candidates[i]] = c_type
+                    if self.candidates[j] in points:
+                        points[self.candidates[j]] += c_type
+                    else:
+                        points[self.candidates[j]] = c_type
+                elif score1 > score2:
+                    if self.candidates[i] in points:
+                        points[self.candidates[i]] += 1
+                    else:
+                        points[self.candidates[i]] = 1
                 else:
-                    if candidates[j] in points:
-                        points[candidates[j]] += 1
+                    if self.candidates[j] in points:
+                        points[self.candidates[j]] += 1
                     else:
-                        points[candidates[j]] = 1
+                        points[self.candidates[j]] = 1
                 score1 = 0
                 score2 = 0
         sorted_dict = sorted(points.items(), key = lambda kv: kv[1], reverse = True)
         
         #check if a Condorcet Winner exists
         self.hasCondorcetWinner = False
-        if sorted_dict[0][1] == len(candidates) - 1:
+        if sorted_dict[0][1] == len(self.candidates) - 1:
             self.hasCondorcetWinner = True
             self.condorcetWinner = sorted_dict[0][0]
-
         return sorted_dict
         
     def copeland(self, candidates):
-        sorted_dict = self.head_to_head(candidates)
+        sorted_dict = self.head_to_head(candidates, 0.5)
         return sorted_dict[0][0]
 
 
@@ -385,8 +393,10 @@ class VoteResult3D:
         
 
 def main():
-    test = VoteResult3D(100, 15, "1D", "normal")
-    print(test.iiaCheck("STAR"))
+    test = VoteResult3D(100, 3, "1D", "normal")
+    # print(test.iiaCheck("STAR"))
+
+    print(test.iiaCheck("copeland"))
     
 if __name__ == "__main__":  
     main()

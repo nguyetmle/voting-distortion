@@ -218,7 +218,7 @@ class VoteResult3D:
             self.condorcetWinner = sorted_dict[0][0]
         return sorted_dict
         
-    def copeland(self,c_type):
+    def copeland(self,c_type=0.5):
         sorted_dict = self.head_to_head(c_type)
         return sorted_dict[0][0]
 
